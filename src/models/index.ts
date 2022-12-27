@@ -1,4 +1,7 @@
+import BaseParser from "./base-parser";
+import BaseProvider from "./base-provider";
 import {
+  IProviderInfo,
   IAsset,
   IGoogleFinanceAsset,
   IPriceRange,
@@ -11,6 +14,7 @@ import {
 } from "./types";
 
 export {
+  IProviderInfo,
   IAsset,
   IGoogleFinanceAsset,
   IPriceRange,

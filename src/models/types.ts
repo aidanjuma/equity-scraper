@@ -1,3 +1,10 @@
+export interface IProviderInfo {
+  name: string;
+  baseUrl: string;
+  logo: string;
+  classPath: string;
+}
+
 export interface IAsset {
   assetType?: AssetType;
   ticker: string;
@@ -54,11 +61,11 @@ export interface IBinanceAsset extends IAsset {
 }
 
 export enum AssetType {
-  Stock,
-  Index,
-  Future,
-  Currency,
-  Cryptocurrency,
+  Stock = "Stock",
+  Index = "Index",
+  Future = "Future",
+  Currency = "Currency",
+  Cryptocurrency = "Cryptocurrency",
 }
 
 export enum Market {
