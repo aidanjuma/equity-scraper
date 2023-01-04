@@ -1,3 +1,15 @@
 import { paginateList } from "./common";
+import {
+  eachUniqueCurrency,
+  googleCookies,
+  marketCurrencies,
+  selectors,
+} from "./google";
 
-export default { paginateList };
+export default {
+  paginateList,
+  eachUniqueCurrency,
+  googleCookies,
+  marketCurrencies,
+  selectors,
+};

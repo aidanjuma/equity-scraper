@@ -13,10 +13,11 @@ export interface IAsset {
 }
 
 export interface IGoogleFinanceAsset extends IAsset {
-  market?: string;
-  label?: string;
+  market?: Market;
   marketCurrency?: Currency;
-  price?: number;
+  label?: string;
+  currentPrice?: number;
+  preMarketPrice?: number;
   marketSummary?: IMarketSummary;
   about?: string;
   news?: INewsArticle[];
