@@ -5,8 +5,6 @@ export const expandNumberAbbreviation = (abbreviation: string): number => {
     .split(" ", 1)[0]
     .replace(/[\d.]/g, "");
 
-  console.log(multiplier);
-
   if (value) {
     switch (multiplier) {
       case "K":

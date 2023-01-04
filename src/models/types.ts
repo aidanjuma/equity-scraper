@@ -19,7 +19,7 @@ export interface IGoogleFinanceAsset extends IAsset {
   currentPrice?: number;
   preMarketPrice?: number;
   marketSummary?: IMarketSummary;
-  about?: string;
+  description?: string;
   news?: INewsArticle[];
 }
 
@@ -46,8 +46,8 @@ export interface IMarketSummary {
 export interface INewsArticle {
   title: string;
   link: string;
-  source?: string;
-  published?: string;
+  publisher?: string;
+  whenPublished?: string;
   thumbnail?: string;
 }
 

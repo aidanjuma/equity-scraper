@@ -11,6 +11,13 @@ export const selectors: { [selector: string]: string } = {
   properties: ".w2tnNd",
   tableItems: "div.eYanAe div.gyFHrc",
   tableItemsData: "div.eYanAe div.gyFHrc div.P6K39c",
+  description: ".bLLb2d",
+  news: ".yY3Lee",
+  articleTitle: ".Yfwt5",
+  articleHyperlink: ".z4rs2b a",
+  articlePublisher: ".sfyJob",
+  articlePublishTime: ".Adak",
+  articlePreviewImage: ".Z4idke",
 };
 
 // An object pairing each market to its relevant currency.

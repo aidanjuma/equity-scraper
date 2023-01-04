@@ -1,17 +1,18 @@
 import axios from "axios";
-import puppeteer, { Browser } from "puppeteer";
 import { Element, load } from "cheerio";
+import puppeteer, { Browser, ElementHandle } from "puppeteer";
 import BaseParser from "../../models/base-parser";
+import { googleCookies, marketCurrencies, selectors } from "../../utils/google";
 import {
   expandNumberAbbreviation,
   makeStringFloatCompatible,
   paginateList,
   unescapeHtml,
 } from "../../utils/common";
-import { googleCookies, marketCurrencies, selectors } from "../../utils/google";
 import {
   IGoogleFinanceAsset,
   IMarketSummary,
+  INewsArticle,
   AssetType,
   Market,
 } from "../../models/types";
@@ -118,6 +119,14 @@ class GoogleFinance extends BaseParser {
         asset.assetType!,
         marketSummaryData
       );
+
+      if ((await page.$(selectors.description)) != null)
+        asset.description = await page.$eval(selectors.description, (el) => {
+          return el.innerHTML;
+        });
+
+      const newsList = await page.$$(selectors.news);
+      asset.news = await this.parseNews(newsList);
     }
 
     return asset;
@@ -196,6 +205,62 @@ class GoogleFinance extends BaseParser {
       data[6] != "-" ? parseFloat(data[6]) : undefined;
 
     return marketSummary;
+  };
+
+  private parseNews = async (
+    newsList: ElementHandle<globalThis.Element>[]
+  ): Promise<INewsArticle[]> => {
+    const news: INewsArticle[] = [];
+
+    for (let i = 0; i < newsList.length; i++) {
+      const article = newsList[i];
+
+      // Each individual component for a news article is parsed below:
+      const title: string = await article.$eval(
+        selectors.articleTitle,
+        (el) => {
+          return el.innerHTML;
+        }
+      );
+
+      const link: string = await article.$eval(
+        selectors.articleHyperlink,
+        (el) => {
+          return el.getAttribute("href")?.toString()!;
+        }
+      );
+
+      const publisher: string | undefined = await article.$eval(
+        selectors.articlePublisher,
+        (el) => {
+          return el.innerHTML;
+        }
+      );
+
+      const whenPublished: string | undefined = await article.$eval(
+        selectors.articlePublishTime,
+        (el) => {
+          return el.innerHTML;
+        }
+      );
+
+      const thumbnail: string = await article.$eval(
+        selectors.articlePreviewImage,
+        (el) => {
+          return el.getAttribute("src")?.toString()!;
+        }
+      );
+
+      news.push({
+        title: title,
+        link: link,
+        publisher: publisher,
+        whenPublished: whenPublished,
+        thumbnail: thumbnail,
+      });
+    }
+
+    return news;
   };
 }
 
