@@ -1,14 +1,16 @@
-import { paginateList } from "./common";
+import { googleCookies, marketCurrencies, selectors } from "./google";
 import {
-  eachUniqueCurrency,
-  googleCookies,
-  marketCurrencies,
-  selectors,
-} from "./google";
+  expandNumberAbbreviation,
+  makeStringFloatCompatible,
+  paginateList,
+  unescapeHtml,
+} from "./common";
 
 export default {
+  expandNumberAbbreviation,
+  makeStringFloatCompatible,
   paginateList,
-  eachUniqueCurrency,
+  unescapeHtml,
   googleCookies,
   marketCurrencies,
   selectors,

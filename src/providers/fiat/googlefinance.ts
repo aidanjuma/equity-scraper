@@ -2,7 +2,12 @@ import axios from "axios";
 import puppeteer, { Browser } from "puppeteer";
 import { Element, load } from "cheerio";
 import BaseParser from "../../models/base-parser";
-import { paginateList } from "../../utils/common";
+import {
+  expandNumberAbbreviation,
+  makeStringFloatCompatible,
+  paginateList,
+  unescapeHtml,
+} from "../../utils/common";
 import { googleCookies, marketCurrencies, selectors } from "../../utils/google";
 import {
   IGoogleFinanceAsset,
@@ -17,7 +22,6 @@ class GoogleFinance extends BaseParser {
   protected logo =
     "https://ssl.gstatic.com/finance/favicon/finance_496x496.png";
   protected classPath = "FIAT.GoogleFinance";
-  private readonly floatFilter = RegExp(/\d+\.\d+/gm);
 
   public getAvailableAssets = async (
     limit?: number,
@@ -66,7 +70,9 @@ class GoogleFinance extends BaseParser {
       await page.waitForSelector(selectors.cwiz);
 
       asset.market = ticker.split(":")[1] as Market;
-      asset.label = await page.$eval(selectors.label, (el) => el.innerHTML);
+      asset.label = unescapeHtml(
+        await page.$eval(selectors.label, (el) => el.innerHTML)
+      );
       asset.marketCurrency = marketCurrencies[asset.market as string];
 
       // First to return from this the current price; the second is the pre-market price.
@@ -74,11 +80,9 @@ class GoogleFinance extends BaseParser {
         return els.map((el) => el.innerHTML);
       });
 
-      asset.currentPrice = parseFloat(prices[0].match(this.floatFilter)![0]);
+      asset.currentPrice = makeStringFloatCompatible(prices[0]);
 
-      const preMarketPrice: number | null = parseFloat(
-        prices[1]?.match(this.floatFilter)![0]
-      );
+      const preMarketPrice = makeStringFloatCompatible(prices[1]);
 
       !Number.isNaN(preMarketPrice)
         ? (asset.preMarketPrice = preMarketPrice)
@@ -94,11 +98,26 @@ class GoogleFinance extends BaseParser {
       // Assign asset type by looping through properties until a type is found.
       for (let i = 0; i < assetProperties.length; i++) {
         const property: string = assetProperties[i];
-        if (property in AssetType) {
+        // Remove space - only required in the case of "Futures Contract" to ensure a successful cast.
+        if (property.replace(" ", "") in AssetType) {
           asset.assetType = <AssetType>property;
           break;
         }
       }
+
+      const marketSummaryData: string[] = await page.$$eval(
+        selectors.tableItemsData,
+        (els) => {
+          return els.map((el) => {
+            return el.innerHTML;
+          });
+        }
+      );
+
+      asset.marketSummary = this.parseMarketSummary(
+        asset.assetType!,
+        marketSummaryData
+      );
     }
 
     return asset;
@@ -132,10 +151,51 @@ class GoogleFinance extends BaseParser {
     return browser;
   };
 
-  // TODO: Parse Market Summary: Table Items...
-  private parseMarketSummary = (tableItems: Element[]): IMarketSummary => {
-    // Previous Close: consistent across all asset types.
-    return {};
+  private parseMarketSummary = (
+    assetType: AssetType,
+    data: string[]
+  ): IMarketSummary => {
+    let marketSummary: IMarketSummary = {};
+
+    // Previous Close: consistent across all asset types. Only metric provided for currencies.
+    marketSummary.previousClosePrice = makeStringFloatCompatible(data[0]);
+    if (assetType === AssetType.Currency) return marketSummary;
+
+    // Everything else contains a day range:
+    const splitDayRange: string[] = data[1].split(" - ");
+    marketSummary.dayRange = {
+      low: makeStringFloatCompatible(splitDayRange[0]),
+      high: makeStringFloatCompatible(splitDayRange[1]),
+    };
+
+    // Within the below clause is futures-exclusive data:
+    if (assetType === AssetType.FuturesContract) {
+      marketSummary.volume = expandNumberAbbreviation(data[2]);
+      marketSummary.primaryExchange = <Market>data[3];
+      marketSummary.marketSegment = data[4];
+      marketSummary.openInterest = expandNumberAbbreviation(data[5]);
+      marketSummary.settlementPrice = makeStringFloatCompatible(data[6]);
+
+      return marketSummary;
+    }
+
+    // Everything else beyond this point contains a year range:
+    const splitYearRange: string[] = data[2].split(" - ");
+    marketSummary.yearRange = {
+      low: makeStringFloatCompatible(splitYearRange[0]),
+      high: makeStringFloatCompatible(splitYearRange[1]),
+    };
+
+    if (assetType === AssetType.Index) return marketSummary;
+
+    // Onwards from here must be a stock. Contains the following data:
+    marketSummary.marketCap = expandNumberAbbreviation(data[3]);
+    marketSummary.avgVolume = expandNumberAbbreviation(data[4]);
+    marketSummary.pteRatio = data[5] != "-" ? parseFloat(data[5]) : undefined;
+    marketSummary.dividendYield =
+      data[6] != "-" ? parseFloat(data[6]) : undefined;
+
+    return marketSummary;
   };
 }
 

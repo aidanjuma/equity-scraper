@@ -24,8 +24,8 @@ export interface IGoogleFinanceAsset extends IAsset {
 }
 
 export interface IPriceRange {
-  low: number;
-  high: number;
+  low?: number;
+  high?: number;
 }
 
 export interface IMarketSummary {
@@ -39,7 +39,7 @@ export interface IMarketSummary {
   yearRange?: IPriceRange;
   marketCap?: number;
   avgVolume?: number;
-  pteRatio?: string;
+  pteRatio?: number;
   dividendYield?: number;
 }
 
@@ -64,9 +64,9 @@ export interface IBinanceAsset extends IAsset {
 export enum AssetType {
   Stock = "Stock",
   Index = "Index",
-  Future = "Future",
   Currency = "Currency",
   Cryptocurrency = "Cryptocurrency",
+  FuturesContract = "Futures Contract",
 }
 
 export enum Market {

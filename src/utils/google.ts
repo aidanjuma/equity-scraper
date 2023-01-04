@@ -10,6 +10,7 @@ export const selectors: { [selector: string]: string } = {
   prices: ".YMlKec.fxKbKc",
   properties: ".w2tnNd",
   tableItems: "div.eYanAe div.gyFHrc",
+  tableItemsData: "div.eYanAe div.gyFHrc div.P6K39c",
 };
 
 // An object pairing each market to its relevant currency.
@@ -69,39 +70,3 @@ export const marketCurrencies: { [market: string]: Currency } = {
   CME_EMINIS: Currency.USD, // USA
   NYMEX: Currency.USD, // USA
 };
-
-/* An array that holds each of the possible unique currencies + the ISO4217 counterparts to cases such as GBX/ZAC.
-To be used for the market cap to filter currency from string to i.e. multiply 8.64(B) by 1bn to get as an integer. */
-export const eachUniqueCurrency: string[] = [
-  "USD",
-  "TWD",
-  "KRW",
-  "BRL",
-  "CNY",
-  "IDR",
-  "PLN",
-  "EUR",
-  "TRY",
-  "NZD",
-  "GBX",
-  "GBP",
-  "JPY",
-  "HKD",
-  "INR",
-  "MYR",
-  "AUD",
-  "THB",
-  "CAD",
-  "SAR",
-  "ILA",
-  "ILS",
-  "SEK",
-  "DKK",
-  "SGD",
-  "CHF",
-  "ZAC",
-  "ZAR",
-  "MXN",
-  "ARS",
-  "ISK",
-];
