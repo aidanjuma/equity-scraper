@@ -19,4 +19,11 @@ describe("GoogleFinance Class", () => {
     console.log(assetData);
     expect(assetData).toBeDefined();
   });
+
+  test("Test: Convert $120 to Japanese Yen.", async () => {
+    const googleFinance = new GoogleFinance();
+    const conversion = await googleFinance.convertCurrency("USD", 120, "JPY");
+    console.log(conversion);
+    expect(conversion).toBeDefined();
+  });
 });

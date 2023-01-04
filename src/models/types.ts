@@ -23,6 +23,11 @@ export interface IGoogleFinanceAsset extends IAsset {
   news?: INewsArticle[];
 }
 
+export interface IExchangeRate extends IAsset {
+  basePrice: number;
+  quotePrice: number;
+}
+
 export interface IPriceRange {
   low?: number;
   high?: number;
@@ -64,7 +69,7 @@ export interface IBinanceAsset extends IAsset {
 export enum AssetType {
   Stock = "Stock",
   Index = "Index",
-  Currency = "Currency",
+  ExchangeRate = "Exchange Rate",
   Cryptocurrency = "Cryptocurrency",
   FuturesContract = "Futures Contract",
 }

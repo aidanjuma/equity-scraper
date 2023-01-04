@@ -15,6 +15,7 @@ import {
   INewsArticle,
   AssetType,
   Market,
+  IExchangeRate,
 } from "../../models/types";
 
 class GoogleFinance extends BaseParser {
@@ -132,6 +133,26 @@ class GoogleFinance extends BaseParser {
     return asset;
   };
 
+  public convertCurrency = async (
+    baseAsset: string,
+    basePrice: number,
+    quoteAsset: string
+  ): Promise<IExchangeRate | undefined> => {
+    const ticker: string = `${baseAsset}-${quoteAsset}`;
+    const quoted: number | undefined = (await this.getAssetData(ticker))
+      .currentPrice;
+
+    if (quoted)
+      return {
+        assetType: AssetType.ExchangeRate,
+        baseAsset: baseAsset,
+        quoteAsset: quoteAsset,
+        ticker: ticker,
+        basePrice: basePrice,
+        quotePrice: Number(basePrice * quoted).toFixed(2) as unknown as number, // Casting to satisfy TypeScript linter...
+      };
+  };
+
   private parseAssetFromFinanceUrl = (url: string): IGoogleFinanceAsset => {
     // https://google.com/finance/quote/GME:NYSE => [..., "quote", "GME:NYSE"]
     const chunckedUrl: string[] = url.split("/");
@@ -149,7 +170,6 @@ class GoogleFinance extends BaseParser {
     let browser: Browser | undefined;
     try {
       browser = await puppeteer.launch({
-        headless: false,
         args: ["--disable-setuid-sandbox"],
         ignoreHTTPSErrors: true,
       });
@@ -168,7 +188,7 @@ class GoogleFinance extends BaseParser {
 
     // Previous Close: consistent across all asset types. Only metric provided for currencies.
     marketSummary.previousClosePrice = makeStringFloatCompatible(data[0]);
-    if (assetType === AssetType.Currency) return marketSummary;
+    if (assetType === AssetType.ExchangeRate) return marketSummary;
 
     // Everything else contains a day range:
     const splitDayRange: string[] = data[1].split(" - ");

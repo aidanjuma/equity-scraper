@@ -4,6 +4,7 @@ import {
   IProviderInfo,
   IAsset,
   IGoogleFinanceAsset,
+  IExchangeRate,
   IPriceRange,
   IMarketSummary,
   INewsArticle,
@@ -14,9 +15,12 @@ import {
 } from "./types";
 
 export {
+  BaseParser,
+  BaseProvider,
   IProviderInfo,
   IAsset,
   IGoogleFinanceAsset,
+  IExchangeRate,
   IPriceRange,
   IMarketSummary,
   INewsArticle,
