@@ -26,4 +26,11 @@ describe("GoogleFinance Class", () => {
     console.log(conversion);
     expect(conversion).toBeDefined();
   });
+
+  test("Test: Get the top stories from Google Finance's home page.", async () => {
+    const googleFinance = new GoogleFinance();
+    const stories = await googleFinance.getTopStories();
+    console.log(stories);
+    expect(stories).toBeDefined();
+  });
 });

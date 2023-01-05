@@ -133,6 +133,29 @@ class GoogleFinance extends BaseParser {
     return asset;
   };
 
+  public getTopStories = async (): Promise<INewsArticle[]> => {
+    let stories: INewsArticle[] = [];
+
+    const browser = await this.createBrowserInstance();
+
+    // For safety: only proceed if browser not undefined.
+    if (browser) {
+      const page = await browser.newPage();
+
+      // Add consent cookie(s) & load page.
+      await page.setCookie(...googleCookies);
+      await page.goto(this.baseUrl);
+
+      // Await the creation of news list's CSS class.
+      await page.waitForSelector(selectors.news);
+
+      const news = await page.$$(selectors.news);
+      stories = await this.parseNews(news);
+    }
+
+    return stories;
+  };
+
   public convertCurrency = async (
     baseAsset: string,
     basePrice: number,
