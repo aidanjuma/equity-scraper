@@ -32,19 +32,13 @@ const makeStringFloatCompatible = (string) => {
 };
 exports.makeStringFloatCompatible = makeStringFloatCompatible;
 const paginateList = (list, limit, offset) => {
-    let result;
-    // If both limit & offset, offset first and limit count.
-    limit && offset
-        ? (result = list.slice(offset, limit))
-            ? // If just limit, start from 0 and limit count.
-                limit
-            : (result = list.slice(0, limit))
-                ? // If just offset, start from offset without count limit.
-                    offset
-                : (result = list.slice(offset, 0))
-        : // Else, select all list.
-            (result = list);
-    return result;
+    if (limit && offset)
+        return list.slice(offset, offset + limit);
+    if (limit)
+        return list.slice(0, limit);
+    if (offset)
+        return list.slice(offset, 0);
+    return list;
 };
 exports.paginateList = paginateList;
 const unescapeHtml = (raw) => {
