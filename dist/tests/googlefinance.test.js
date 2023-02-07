@@ -36,10 +36,12 @@ describe("GoogleFinance Class", () => {
         console.log(conversion);
         expect(conversion).toBeDefined();
     });
-    test("Test: Get the top stories from Google Finance's home page.", async () => {
-        const stories = await googleFinance.getTopStories();
+    test("Test: Get the top, local & global financial news from Google Finance's home page.", async () => {
+        const stories = await googleFinance.getLatestNews();
         console.log(stories);
-        expect(stories).toBeDefined();
+        expect(stories).toHaveProperty("topStories");
+        expect(stories).toHaveProperty("localMarket");
+        expect(stories).toHaveProperty("worldMarkets");
     });
 });
 //# sourceMappingURL=googlefinance.test.js.map

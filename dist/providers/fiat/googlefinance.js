@@ -91,8 +91,8 @@ class GoogleFinance extends base_parser_1.default {
             }
             return asset;
         };
-        this.getTopStories = async () => {
-            let stories = [];
+        this.getLatestNews = async () => {
+            let stories = {};
             const browser = await this.createBrowserInstance();
             // For safety: only proceed if browser not undefined.
             if (browser) {
@@ -100,10 +100,26 @@ class GoogleFinance extends base_parser_1.default {
                 // Add consent cookie(s) & load page.
                 await page.setCookie(...google_1.googleCookies);
                 await page.goto(this.baseUrl);
-                // Await the creation of news list's CSS class.
-                await page.waitForSelector(google_1.selectors.news);
-                const news = await page.$$(google_1.selectors.news);
-                stories = await this.parseNews(news);
+                for (let i = 0; i < 3; i++) {
+                    switch (i) {
+                        case 0:
+                            // Await the creation of news list's CSS class.
+                            await page.waitForSelector(google_1.selectors.news);
+                            stories.topStories = await this.parseNews(await page.$$(google_1.selectors.news));
+                        case 1:
+                            await page.waitForSelector(google_1.selectors.localMarketNews);
+                            await page.click(google_1.selectors.localMarketNews);
+                            // Await the creation of news list's CSS class.
+                            await page.waitForSelector(google_1.selectors.news);
+                            stories.localMarket = await this.parseNews(await page.$$(google_1.selectors.news));
+                        case 2:
+                            await page.waitForSelector(google_1.selectors.worldMarketNews);
+                            await page.click(google_1.selectors.worldMarketNews);
+                            // Await the creation of news list's CSS class.
+                            await page.waitForSelector(google_1.selectors.news);
+                            stories.worldMarkets = await this.parseNews(await page.$$(google_1.selectors.news));
+                    }
+                }
             }
             return stories;
         };

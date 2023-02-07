@@ -133,8 +133,16 @@ class GoogleFinance extends BaseParser {
     return asset;
   };
 
-  public getTopStories = async (): Promise<INewsArticle[]> => {
-    let stories: INewsArticle[] = [];
+  public getLatestNews = async (): Promise<{
+    topStories?: INewsArticle[];
+    localMarket?: INewsArticle[];
+    worldMarkets?: INewsArticle[];
+  }> => {
+    let stories: {
+      topStories?: INewsArticle[];
+      localMarket?: INewsArticle[];
+      worldMarkets?: INewsArticle[];
+    } = {};
 
     const browser = await this.createBrowserInstance();
 
@@ -146,11 +154,37 @@ class GoogleFinance extends BaseParser {
       await page.setCookie(...googleCookies);
       await page.goto(this.baseUrl);
 
-      // Await the creation of news list's CSS class.
-      await page.waitForSelector(selectors.news);
+      for (let i = 0; i < 3; i++) {
+        switch (i) {
+          case 0:
+            // Await the creation of news list's CSS class.
+            await page.waitForSelector(selectors.news);
 
-      const news = await page.$$(selectors.news);
-      stories = await this.parseNews(news);
+            stories.topStories = await this.parseNews(
+              await page.$$(selectors.news)
+            );
+
+          case 1:
+            await page.waitForSelector(selectors.localMarketNews);
+            await page.click(selectors.localMarketNews);
+            // Await the creation of news list's CSS class.
+            await page.waitForSelector(selectors.news);
+
+            stories.localMarket = await this.parseNews(
+              await page.$$(selectors.news)
+            );
+
+          case 2:
+            await page.waitForSelector(selectors.worldMarketNews);
+            await page.click(selectors.worldMarketNews);
+            // Await the creation of news list's CSS class.
+            await page.waitForSelector(selectors.news);
+
+            stories.worldMarkets = await this.parseNews(
+              await page.$$(selectors.news)
+            );
+        }
+      }
     }
 
     return stories;

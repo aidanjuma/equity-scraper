@@ -7,7 +7,11 @@ declare class GoogleFinance extends BaseParser {
     protected classPath: string;
     getAvailableAssets: (limit?: number, offset?: number) => Promise<IGoogleFinanceAsset[]>;
     getAssetData: (ticker: string) => Promise<IGoogleFinanceAsset>;
-    getTopStories: () => Promise<INewsArticle[]>;
+    getLatestNews: () => Promise<{
+        topStories?: INewsArticle[];
+        localMarket?: INewsArticle[];
+        worldMarkets?: INewsArticle[];
+    }>;
     convertCurrency: (baseAsset: string, basePrice: number, quoteAsset: string) => Promise<IExchangeRate | undefined>;
     private parseAssetFromFinanceUrl;
     private createBrowserInstance;

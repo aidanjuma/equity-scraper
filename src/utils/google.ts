@@ -18,6 +18,8 @@ export const selectors: { [selector: string]: string } = {
   articlePublisher: ".sfyJob",
   articlePublishTime: ".Adak",
   articlePreviewImage: ".Z4idke",
+  localMarketNews: `div[data-tab-id="localMarketNews"]`,
+  worldMarketNews: `div[data-tab-id="worldMarketNews"]`,
 };
 
 // An object pairing each market to its relevant currency.
