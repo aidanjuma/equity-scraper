@@ -17,6 +17,16 @@ class GoogleFinance extends base_parser_1.default {
         this.baseUrl = "https://google.com/finance";
         this.logo = "https://ssl.gstatic.com/finance/favicon/finance_496x496.png";
         this.classPath = "FIAT.GoogleFinance";
+        this.isInitialized = false;
+        this.initialize = async () => {
+            this.browser = await this.createBrowserInstance();
+            if (this.browser)
+                this.isInitialized = true;
+        };
+        this.destroyBrowserInstance = async () => {
+            var _a;
+            await ((_a = this.browser) === null || _a === void 0 ? void 0 : _a.close());
+        };
         this.getAvailableAssets = async (limit, offset) => {
             let assets = [];
             const url = `${this.baseUrl}/sitemap.xml`;
@@ -40,10 +50,11 @@ class GoogleFinance extends base_parser_1.default {
         };
         this.getAssetData = async (ticker) => {
             let asset = { ticker: ticker };
-            const browser = await this.createBrowserInstance();
+            if (!this.isInitialized)
+                await this.initialize();
             // For safety: only proceed if browser not undefined.
-            if (browser) {
-                const page = await browser.newPage();
+            if (this.browser) {
+                const page = await this.browser.newPage();
                 // Add consent cookie(s) & load page.
                 await page.setCookie(...google_1.googleCookies);
                 await page.goto(`${this.baseUrl}/quote/${ticker}`);
@@ -88,15 +99,17 @@ class GoogleFinance extends base_parser_1.default {
                     });
                 const newsList = await page.$$(google_1.selectors.news);
                 asset.news = await this.parseNews(newsList);
+                await page.close();
             }
             return asset;
         };
         this.getLatestNews = async () => {
             let stories = {};
-            const browser = await this.createBrowserInstance();
+            if (!this.isInitialized)
+                await this.initialize();
             // For safety: only proceed if browser not undefined.
-            if (browser) {
-                const page = await browser.newPage();
+            if (this.browser) {
+                const page = await this.browser.newPage();
                 // Add consent cookie(s) & load page.
                 await page.setCookie(...google_1.googleCookies);
                 await page.goto(this.baseUrl);
@@ -120,6 +133,7 @@ class GoogleFinance extends base_parser_1.default {
                             stories.worldMarkets = await this.parseNews(await page.$$(google_1.selectors.news));
                     }
                 }
+                await page.close();
             }
             return stories;
         };
@@ -147,19 +161,6 @@ class GoogleFinance extends base_parser_1.default {
             // "NYSE"
             const market = symbol[1];
             return { ticker: ticker, market: market };
-        };
-        this.createBrowserInstance = async () => {
-            let browser;
-            try {
-                browser = await puppeteer_1.default.launch({
-                    args: ["--disable-setuid-sandbox"],
-                    ignoreHTTPSErrors: true,
-                });
-            }
-            catch (err) {
-                throw new Error(err.message);
-            }
-            return browser;
         };
         this.parseMarketSummary = (assetType, data) => {
             let marketSummary = {};
@@ -229,6 +230,19 @@ class GoogleFinance extends base_parser_1.default {
                 });
             }
             return news;
+        };
+        this.createBrowserInstance = async () => {
+            let browser;
+            try {
+                browser = await puppeteer_1.default.launch({
+                    args: ["--disable-setuid-sandbox"],
+                    ignoreHTTPSErrors: true,
+                });
+            }
+            catch (err) {
+                throw new Error(err.message);
+            }
+            return browser;
         };
     }
 }

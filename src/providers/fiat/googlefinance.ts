@@ -24,6 +24,17 @@ class GoogleFinance extends BaseParser {
   protected logo =
     "https://ssl.gstatic.com/finance/favicon/finance_496x496.png";
   protected classPath = "FIAT.GoogleFinance";
+  private browser: Browser | undefined;
+  private isInitialized = false;
+
+  private initialize = async () => {
+    this.browser = await this.createBrowserInstance();
+    if (this.browser) this.isInitialized = true;
+  };
+
+  public destroyBrowserInstance = async () => {
+    await this.browser?.close();
+  };
 
   public getAvailableAssets = async (
     limit?: number,
@@ -58,11 +69,11 @@ class GoogleFinance extends BaseParser {
   ): Promise<IGoogleFinanceAsset> => {
     let asset: IGoogleFinanceAsset = { ticker: ticker };
 
-    const browser = await this.createBrowserInstance();
+    if (!this.isInitialized) await this.initialize();
 
     // For safety: only proceed if browser not undefined.
-    if (browser) {
-      const page = await browser.newPage();
+    if (this.browser) {
+      const page = await this.browser.newPage();
 
       // Add consent cookie(s) & load page.
       await page.setCookie(...googleCookies);
@@ -128,6 +139,8 @@ class GoogleFinance extends BaseParser {
 
       const newsList = await page.$$(selectors.news);
       asset.news = await this.parseNews(newsList);
+
+      await page.close();
     }
 
     return asset;
@@ -144,11 +157,11 @@ class GoogleFinance extends BaseParser {
       worldMarkets?: INewsArticle[];
     } = {};
 
-    const browser = await this.createBrowserInstance();
+    if (!this.isInitialized) await this.initialize();
 
     // For safety: only proceed if browser not undefined.
-    if (browser) {
-      const page = await browser.newPage();
+    if (this.browser) {
+      const page = await this.browser.newPage();
 
       // Add consent cookie(s) & load page.
       await page.setCookie(...googleCookies);
@@ -185,6 +198,7 @@ class GoogleFinance extends BaseParser {
             );
         }
       }
+      await page.close();
     }
 
     return stories;
@@ -221,20 +235,6 @@ class GoogleFinance extends BaseParser {
     const market: Market = symbol[1] as Market;
 
     return { ticker: ticker, market: market };
-  };
-
-  private createBrowserInstance = async (): Promise<Browser | undefined> => {
-    let browser: Browser | undefined;
-    try {
-      browser = await puppeteer.launch({
-        args: ["--disable-setuid-sandbox"],
-        ignoreHTTPSErrors: true,
-      });
-    } catch (err) {
-      throw new Error((err as Error).message);
-    }
-
-    return browser;
   };
 
   private parseMarketSummary = (
@@ -338,6 +338,20 @@ class GoogleFinance extends BaseParser {
     }
 
     return news;
+  };
+
+  private createBrowserInstance = async (): Promise<Browser | undefined> => {
+    let browser: Browser | undefined;
+    try {
+      browser = await puppeteer.launch({
+        args: ["--disable-setuid-sandbox"],
+        ignoreHTTPSErrors: true,
+      });
+    } catch (err) {
+      throw new Error((err as Error).message);
+    }
+
+    return browser;
   };
 }
 
