@@ -17,6 +17,7 @@ export interface IGoogleFinanceAsset extends IAsset {
   marketCurrency?: Currency;
   label?: string;
   currentPrice?: number;
+  dailyPriceDelta?: number;
   preMarketPrice?: number;
   marketSummary?: IMarketSummary;
   description?: string;

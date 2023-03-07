@@ -25,7 +25,7 @@ const expandNumberAbbreviation = (abbreviation) => {
     return 0;
 };
 exports.expandNumberAbbreviation = expandNumberAbbreviation;
-const floatFilter = RegExp(/\d+\.\d+/gm);
+const floatFilter = RegExp(/[-+]?\d+\.\d+/gm);
 const makeStringFloatCompatible = (string) => {
     if (string)
         return parseFloat(string.replace(",", "").match(floatFilter)[0]);

@@ -68,6 +68,10 @@ class GoogleFinance extends base_parser_1.default {
                     return els.map((el) => el.innerHTML);
                 });
                 asset.currentPrice = (0, common_1.makeStringFloatCompatible)(prices[0]);
+                const dailyPriceDelta = await page.$eval(google_1.selectors.dailyPriceDelta, (el) => {
+                    return el.innerHTML;
+                });
+                asset.dailyPriceDelta = (0, common_1.makeStringFloatCompatible)(dailyPriceDelta);
                 const preMarketPrice = (0, common_1.makeStringFloatCompatible)(prices[1]);
                 !Number.isNaN(preMarketPrice)
                     ? (asset.preMarketPrice = preMarketPrice)

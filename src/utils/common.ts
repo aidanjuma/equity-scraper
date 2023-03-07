@@ -24,7 +24,7 @@ export const expandNumberAbbreviation = (abbreviation: string): number => {
   return 0;
 };
 
-const floatFilter = RegExp(/\d+\.\d+/gm);
+const floatFilter = RegExp(/[-+]?\d+\.\d+/gm);
 export const makeStringFloatCompatible = (
   string: string
 ): number | undefined => {

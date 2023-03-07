@@ -95,6 +95,15 @@ class GoogleFinance extends BaseParser {
 
       asset.currentPrice = makeStringFloatCompatible(prices[0]);
 
+      const dailyPriceDelta: string = await page.$eval(
+        selectors.dailyPriceDelta,
+        (el) => {
+          return el.innerHTML;
+        }
+      );
+
+      asset.dailyPriceDelta = makeStringFloatCompatible(dailyPriceDelta);
+
       const preMarketPrice = makeStringFloatCompatible(prices[1]);
 
       !Number.isNaN(preMarketPrice)
