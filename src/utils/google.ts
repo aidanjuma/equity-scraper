@@ -8,7 +8,7 @@ export const selectors: { [selector: string]: string } = {
   cwiz: ".zQTmif.SSPGKf.u5wqUe",
   label: ".zzDege",
   prices: ".YMlKec.fxKbKc",
-  dailyPriceDelta: ".P2Luy.Ebnabc.ZYVHBb",
+  dailyPriceDelta: ".P2Luy.ZYVHBb",
   properties: ".w2tnNd",
   tableItems: "div.eYanAe div.gyFHrc",
   tableItemsData: "div.eYanAe div.gyFHrc div.P6K39c",
