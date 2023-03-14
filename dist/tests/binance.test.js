@@ -10,6 +10,7 @@ describe("Binance Class", () => {
     test("Test: Get all available assets from Binance.", async () => {
         const binance = new binance_1.default();
         const assets = await binance.getAvailableAssets();
+        console.log(assets);
         expect(assets).toBeDefined();
     });
     test("Test: Get asset price for ETHBUSD from Binance.", async () => {

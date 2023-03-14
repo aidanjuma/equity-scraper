@@ -8,6 +8,7 @@ describe("Binance Class", () => {
   test("Test: Get all available assets from Binance.", async () => {
     const binance = new Binance();
     const assets = await binance.getAvailableAssets();
+    console.log(assets);
     expect(assets).toBeDefined();
   });
 

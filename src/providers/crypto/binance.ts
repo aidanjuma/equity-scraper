@@ -52,12 +52,12 @@ class Binance extends BaseParser {
   private parseIBinanceAsset = (assetItem: any): IBinanceAsset => {
     const asset: IBinanceAsset = {
       assetType: AssetType.Cryptocurrency,
-      ticker: assetItem["assetItem"],
+      ticker: assetItem["symbol"],
       status: assetItem["status"],
       baseAsset: assetItem["baseAsset"],
       baseAssetPrecision: assetItem["baseAssetPrecision"],
       quoteAsset: assetItem["quoteAsset"],
-      quotePrecision: assetItem["quoteAsset"],
+      quotePrecision: assetItem["quotePrecision"],
       quoteAssetPrecision: assetItem["quoteAssetPrecision"],
       price: parseFloat(assetItem["price"]),
     };
