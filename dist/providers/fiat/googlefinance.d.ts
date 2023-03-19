@@ -10,7 +10,7 @@ declare class GoogleFinance extends BaseParser {
     private initialize;
     destroyBrowserInstance: () => Promise<void>;
     getAvailableAssets: (limit?: number, offset?: number) => Promise<IGoogleFinanceAsset[]>;
-    getAssetData: (ticker: string) => Promise<IGoogleFinanceAsset>;
+    getAssetData: (assetId: string) => Promise<IGoogleFinanceAsset>;
     getLatestNews: () => Promise<{
         topStories?: INewsArticle[];
         localMarket?: INewsArticle[];

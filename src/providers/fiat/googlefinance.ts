@@ -65,9 +65,14 @@ class GoogleFinance extends BaseParser {
   };
 
   public getAssetData = async (
-    ticker: string
+    assetId: string
   ): Promise<IGoogleFinanceAsset> => {
-    let asset: IGoogleFinanceAsset = { ticker: ticker };
+    const symbol: string[] = assetId.split(":");
+
+    let asset: IGoogleFinanceAsset = {
+      ticker: symbol[0],
+      market: symbol[1] as Market,
+    };
 
     if (!this.isInitialized) await this.initialize();
 
@@ -77,12 +82,11 @@ class GoogleFinance extends BaseParser {
 
       // Add consent cookie(s) & load page.
       await page.setCookie(...googleCookies);
-      await page.goto(`${this.baseUrl}/quote/${ticker}`);
+      await page.goto(`${this.baseUrl}/quote/${assetId}`);
 
       // Await the creation of <c-wiz> tag on asset page.
       await page.waitForSelector(selectors.cwiz);
 
-      asset.market = ticker.split(":")[1] as Market;
       asset.label = unescapeHtml(
         await page.$eval(selectors.label, (el) => el.innerHTML)
       );
@@ -235,9 +239,9 @@ class GoogleFinance extends BaseParser {
 
   private parseAssetFromFinanceUrl = (url: string): IGoogleFinanceAsset => {
     // https://google.com/finance/quote/GME:NYSE => [..., "quote", "GME:NYSE"]
-    const chunckedUrl: string[] = url.split("/");
+    const chunkedUrl: string[] = url.split("/");
     // "GME:NYSE"
-    const symbol: string[] = chunckedUrl[chunckedUrl.length - 1].split(":");
+    const symbol: string[] = chunkedUrl[chunkedUrl.length - 1].split(":");
     // "GME"
     const ticker: string = symbol[0];
     // "NYSE"

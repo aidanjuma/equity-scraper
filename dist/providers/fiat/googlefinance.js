@@ -48,8 +48,12 @@ class GoogleFinance extends base_parser_1.default {
             }
             return assets;
         };
-        this.getAssetData = async (ticker) => {
-            let asset = { ticker: ticker };
+        this.getAssetData = async (assetId) => {
+            const symbol = assetId.split(":");
+            let asset = {
+                ticker: symbol[0],
+                market: symbol[1],
+            };
             if (!this.isInitialized)
                 await this.initialize();
             // For safety: only proceed if browser not undefined.
@@ -57,10 +61,9 @@ class GoogleFinance extends base_parser_1.default {
                 const page = await this.browser.newPage();
                 // Add consent cookie(s) & load page.
                 await page.setCookie(...google_1.googleCookies);
-                await page.goto(`${this.baseUrl}/quote/${ticker}`);
+                await page.goto(`${this.baseUrl}/quote/${assetId}`);
                 // Await the creation of <c-wiz> tag on asset page.
                 await page.waitForSelector(google_1.selectors.cwiz);
-                asset.market = ticker.split(":")[1];
                 asset.label = (0, common_1.unescapeHtml)(await page.$eval(google_1.selectors.label, (el) => el.innerHTML));
                 asset.marketCurrency = google_1.marketCurrencies[asset.market];
                 // First to return from this the current price; the second is the pre-market price.
@@ -157,9 +160,9 @@ class GoogleFinance extends base_parser_1.default {
         };
         this.parseAssetFromFinanceUrl = (url) => {
             // https://google.com/finance/quote/GME:NYSE => [..., "quote", "GME:NYSE"]
-            const chunckedUrl = url.split("/");
+            const chunkedUrl = url.split("/");
             // "GME:NYSE"
-            const symbol = chunckedUrl[chunckedUrl.length - 1].split(":");
+            const symbol = chunkedUrl[chunkedUrl.length - 1].split(":");
             // "GME"
             const ticker = symbol[0];
             // "NYSE"

@@ -1,6 +1,6 @@
 {
   "name": "equity-scraper",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A TypeScript library written for my A-Level Computer Science NEA project, 'Equity Finance'. Gathers data from various finance websites via scraping or requesting their APIs.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
