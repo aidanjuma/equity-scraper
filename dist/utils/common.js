@@ -26,10 +26,7 @@ const expandNumberAbbreviation = (abbreviation) => {
 };
 exports.expandNumberAbbreviation = expandNumberAbbreviation;
 const floatFilter = RegExp(/[-+]?\d+\.\d+/gm);
-const makeStringFloatCompatible = (string) => {
-    if (string)
-        return parseFloat(string.replace(",", "").match(floatFilter)[0]);
-};
+const makeStringFloatCompatible = (string) => parseFloat(string.replace(",", "").match(floatFilter)[0]);
 exports.makeStringFloatCompatible = makeStringFloatCompatible;
 const paginateList = (list, limit, offset) => {
     if (limit && offset)
