@@ -147,7 +147,7 @@ class GoogleFinance extends BaseParser {
 
       if ((await page.$(selectors.description)) != null)
         asset.description = await page.$eval(selectors.description, (el) => {
-          return el.innerHTML;
+          return el.textContent ?? undefined;
         });
 
       const newsList = await page.$$(selectors.news);

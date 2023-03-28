@@ -102,7 +102,8 @@ class GoogleFinance extends base_parser_1.default {
                 asset.marketSummary = this.parseMarketSummary(asset.assetType, marketSummaryData);
                 if ((await page.$(google_1.selectors.description)) != null)
                     asset.description = await page.$eval(google_1.selectors.description, (el) => {
-                        return el.innerHTML;
+                        var _a;
+                        return (_a = el.textContent) !== null && _a !== void 0 ? _a : undefined;
                     });
                 const newsList = await page.$$(google_1.selectors.news);
                 asset.news = await this.parseNews(newsList);
