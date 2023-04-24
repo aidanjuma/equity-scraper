@@ -26,7 +26,9 @@ export const expandNumberAbbreviation = (abbreviation: string): number => {
 
 const floatFilter = RegExp(/[-+]?\d+\.\d+/gm);
 export const makeStringFloatCompatible = (string: string): number | undefined =>
-  parseFloat(string.replace(",", "").match(floatFilter)![0]);
+  string != undefined
+    ? parseFloat(string.replace(",", "").match(floatFilter)![0])
+    : undefined;
 
 export const paginateList = (
   list: any[],
