@@ -1,5 +1,6 @@
 import axios from "axios";
 import BaseParser from "../../models/base-parser";
+import { paginateList } from "../../utils/common";
 import { AssetType, IBinanceAsset } from "../../models/types";
 
 class Binance extends BaseParser {
@@ -9,12 +10,11 @@ class Binance extends BaseParser {
     "https://upload.wikimedia.org/wikipedia/commons/5/57/Binance_Logo.png";
   protected classPath = "CRYPTO.Binance";
 
-  // TODO: Pagination...
   override getAvailableAssets = async (
     limit?: number,
     offset?: number
   ): Promise<IBinanceAsset[]> => {
-    const assets: IBinanceAsset[] = [];
+    let assets: IBinanceAsset[] = [];
     const url = `${this.baseUrl}/exchangeInfo`;
 
     try {
@@ -24,6 +24,8 @@ class Binance extends BaseParser {
         const assetItem = data.symbols[i];
         assets.push(this.parseIBinanceAsset(assetItem));
       }
+
+      if (limit || offset) assets = paginateList(assets, limit!, offset!);
     } catch (err) {
       throw new Error((err as Error).message);
     }

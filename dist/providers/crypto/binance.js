@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const base_parser_1 = __importDefault(require("../../models/base-parser"));
+const common_1 = require("../../utils/common");
 const types_1 = require("../../models/types");
 class Binance extends base_parser_1.default {
     constructor() {
@@ -13,9 +14,8 @@ class Binance extends base_parser_1.default {
         this.baseUrl = "https://api.binance.com/api/v3";
         this.logo = "https://upload.wikimedia.org/wikipedia/commons/5/57/Binance_Logo.png";
         this.classPath = "CRYPTO.Binance";
-        // TODO: Pagination...
         this.getAvailableAssets = async (limit, offset) => {
-            const assets = [];
+            let assets = [];
             const url = `${this.baseUrl}/exchangeInfo`;
             try {
                 const { data } = await axios_1.default.get(url);
@@ -23,6 +23,8 @@ class Binance extends base_parser_1.default {
                     const assetItem = data.symbols[i];
                     assets.push(this.parseIBinanceAsset(assetItem));
                 }
+                if (limit || offset)
+                    assets = (0, common_1.paginateList)(assets, limit, offset);
             }
             catch (err) {
                 throw new Error(err.message);
